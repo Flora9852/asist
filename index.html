@@ -1,10 +1,10 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ChatGPT Clone</title>
+  <title>Клон</title>
   <style>
     * { box-sizing: border-box; }
     body {
@@ -15,11 +15,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
       padding: 2rem;
-    }
-    h1 {
-      margin-bottom: 1rem;
     }
     .chat-container {
       width: 100%;
@@ -38,14 +34,8 @@
       border-radius: 10px;
       max-width: 75%;
     }
-    .user {
-      background-color: #3b3b5c;
-      align-self: flex-end;
-    }
-    .assistant {
-      background-color: #4e4e7b;
-      align-self: flex-start;
-    }
+    .user { background-color: #3b3b5c; align-self: flex-end; }
+    .assistant { background-color: #4e4e7b; align-self: flex-start; }
     .input-area {
       margin-top: 1rem;
       display: flex;
@@ -67,34 +57,10 @@
       color: white;
       cursor: pointer;
     }
-    .settings, .upload {
-      margin: 1rem 0;
-      width: 100%;
-      max-width: 800px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    input[type="file"] {
-      color: #fff;
-    }
-    label {
-      font-weight: bold;
-    }
   </style>
 </head>
 <body>
-  <h1>ChatGPT Clone</h1>
-
-  <div class="settings">
-    <label for="temperature">Temperature:</label>
-    <input type="range" id="temperature" name="temperature" min="0" max="1" step="0.1" value="0.7">
-  </div>
-
-  <div class="upload">
-    <label for="fileInput">Upload File:</label>
-    <input type="file" id="fileInput">
-  </div>
+  <h1>ChatGPT Клон</h1>
 
   <div class="chat-container" id="chat">
     <div class="message assistant">Привет! Чем могу помочь?</div>
@@ -106,31 +72,44 @@
   </div>
 
   <script>
-    function sendMessage() {
-      const input = document.getElementById("userInput");
+    const endpoint = 'https://appeared-russell-hartford-four.trycloudflare.com/webhook/chat'; // Подставь свой Cloudflare адрес
+
+    const input = document.getElementById("userInput");
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Enter") sendMessage();
+    });
+
+    async function sendMessage() {
       const chat = document.getElementById("chat");
       const message = input.value.trim();
-      if (message === "") return;
+      if (!message) return;
+      input.value = "";
 
       const userMsg = document.createElement("div");
       userMsg.className = "message user";
       userMsg.textContent = message;
       chat.appendChild(userMsg);
-
-      input.value = "";
-
-      // Scroll down
       chat.scrollTop = chat.scrollHeight;
 
-      // Simulate assistant response
       const botMsg = document.createElement("div");
       botMsg.className = "message assistant";
-      botMsg.textContent = "Обрабатываю ваш запрос...";
-      setTimeout(() => {
-        botMsg.textContent = "Это пример ответа. Здесь будет ответ от модели.";
-        chat.appendChild(botMsg);
-        chat.scrollTop = chat.scrollHeight;
-      }, 1000);
+      botMsg.textContent = "Печатаю ответ...";
+      chat.appendChild(botMsg);
+      chat.scrollTop = chat.scrollHeight;
+
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+        botMsg.textContent = data.answer || "🤖 Нет ответа";
+      } catch (err) {
+        botMsg.textContent = "❌ Ошибка соединения";
+      }
+
+      chat.scrollTop = chat.scrollHeight;
     }
   </script>
 </body>

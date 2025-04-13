@@ -1,58 +1,136 @@
+
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ассистент GPT</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ChatGPT Clone</title>
   <style>
-    body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 10px; background: #f5f5f5; }
-    #chat { background: white; padding: 10px; border-radius: 10px; min-height: 300px; }
-    .msg { margin-bottom: 12px; }
-    .user { color: #007acc; }
-    .bot { color: #0a960a; }
-    input, button { padding: 10px; font-size: 1em; margin-top: 10px; }
-    input { width: 80%; }
-    button { width: 18%; background: #007acc; color: white; border: none; border-radius: 5px; }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #1e1e2f;
+      color: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 2rem;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    .chat-container {
+      width: 100%;
+      max-width: 800px;
+      background-color: #2a2a40;
+      border-radius: 10px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      height: 70vh;
+      overflow-y: auto;
+    }
+    .message {
+      margin: 0.5rem 0;
+      padding: 0.75rem;
+      border-radius: 10px;
+      max-width: 75%;
+    }
+    .user {
+      background-color: #3b3b5c;
+      align-self: flex-end;
+    }
+    .assistant {
+      background-color: #4e4e7b;
+      align-self: flex-start;
+    }
+    .input-area {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.5rem;
+      width: 100%;
+      max-width: 800px;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 0.75rem;
+      border-radius: 5px;
+      border: none;
+    }
+    .input-area button {
+      padding: 0.75rem 1rem;
+      border: none;
+      border-radius: 5px;
+      background-color: #00b894;
+      color: white;
+      cursor: pointer;
+    }
+    .settings, .upload {
+      margin: 1rem 0;
+      width: 100%;
+      max-width: 800px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    input[type="file"] {
+      color: #fff;
+    }
+    label {
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h2>GPT Ассистент</h2>
-  <div id="chat"></div>
-  <input id="msg" placeholder="Введите сообщение..." />
-  <button onclick="send()">Отправить</button>
+  <h1>ChatGPT Clone</h1>
+
+  <div class="settings">
+    <label for="temperature">Temperature:</label>
+    <input type="range" id="temperature" name="temperature" min="0" max="1" step="0.1" value="0.7">
+  </div>
+
+  <div class="upload">
+    <label for="fileInput">Upload File:</label>
+    <input type="file" id="fileInput">
+  </div>
+
+  <div class="chat-container" id="chat">
+    <div class="message assistant">Привет! Чем могу помочь?</div>
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Введите сообщение..." />
+    <button onclick="sendMessage()">Отправить</button>
+  </div>
 
   <script>
-    const webhookURL = "https://appeared-russell-hartford-four.trycloudflare.com/webhook-test";
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const chat = document.getElementById("chat");
+      const message = input.value.trim();
+      if (message === "") return;
 
-    async function send() {
-      const input = document.getElementById('msg');
-      const text = input.value.trim();
-      if (!text) return;
+      const userMsg = document.createElement("div");
+      userMsg.className = "message user";
+      userMsg.textContent = message;
+      chat.appendChild(userMsg);
 
-      input.value = '';
-      appendMessage('Вы', text, 'user');
+      input.value = "";
 
-      try {
-        const response = await fetch(webhookURL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ message: text })
-        });
-
-        const data = await response.json();
-        appendMessage('Бот', data.reply || 'Нет ответа 🤖', 'bot');
-      } catch (err) {
-        appendMessage('Бот', 'Ошибка запроса ❌', 'bot');
-      }
-    }
-
-    function appendMessage(sender, text, cls) {
-      const chat = document.getElementById('chat');
-      const msg = document.createElement('div');
-      msg.className = 'msg ' + cls;
-      msg.innerHTML = `<b>${sender}:</b> ${text}`;
-      chat.appendChild(msg);
+      // Scroll down
       chat.scrollTop = chat.scrollHeight;
+
+      // Simulate assistant response
+      const botMsg = document.createElement("div");
+      botMsg.className = "message assistant";
+      botMsg.textContent = "Обрабатываю ваш запрос...";
+      setTimeout(() => {
+        botMsg.textContent = "Это пример ответа. Здесь будет ответ от модели.";
+        chat.appendChild(botMsg);
+        chat.scrollTop = chat.scrollHeight;
+      }, 1000);
     }
   </script>
 </body>

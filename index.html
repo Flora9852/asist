@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ассистент GPT</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 10px; background: #f5f5f5; }
+    #chat { background: white; padding: 10px; border-radius: 10px; min-height: 300px; }
+    .msg { margin-bottom: 12px; }
+    .user { color: #007acc; }
+    .bot { color: #0a960a; }
+    input, button { padding: 10px; font-size: 1em; margin-top: 10px; }
+    input { width: 80%; }
+    button { width: 18%; background: #007acc; color: white; border: none; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h2>GPT Ассистент</h2>
+  <div id="chat"></div>
+  <input id="msg" placeholder="Введите сообщение..." />
+  <button onclick="send()">Отправить</button>
+
+  <script>
+    const webhookURL = "https://appeared-russell-hartford-four.trycloudflare.com/webhook-test";
+
+    async function send() {
+      const input = document.getElementById('msg');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      appendMessage('Вы', text, 'user');
+
+      try {
+        const response = await fetch(webhookURL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: text })
+        });
+
+        const data = await response.json();
+        appendMessage('Бот', data.reply || 'Нет ответа 🤖', 'bot');
+      } catch (err) {
+        appendMessage('Бот', 'Ошибка запроса ❌', 'bot');
+      }
+    }
+
+    function appendMessage(sender, text, cls) {
+      const chat = document.getElementById('chat');
+      const msg = document.createElement('div');
+      msg.className = 'msg ' + cls;
+      msg.innerHTML = `<b>${sender}:</b> ${text}`;
+      chat.appendChild(msg);
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
